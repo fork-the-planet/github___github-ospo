@@ -4,15 +4,20 @@ on:
   schedule:
     - cron: "3 2 1 * *"
 
-permissions:
-  discussions: write
+permissions: {}
 
 jobs:
   contributor_report:
     name: contributor reports
     runs-on: ubuntu-latest
+    permissions:
+      discussions: write # Create the monthly thank-you discussion via abirismyname/create-discussion
 
     steps:
+      - uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
       - name: Get dates for last month
         shell: bash
         run: |
@@ -27,7 +32,7 @@ jobs:
           echo "END_DATE=$end_date" >> "$GITHUB_ENV"
 
       - name: Run contributor action
-        uses: github-community-projects/contributors@v2
+        uses: github-community-projects/contributors@4fda46a62ca1f1f1162c053c11d9576ae0cdda99 # v2.0.15
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           START_DATE: ${{ env.START_DATE }}
@@ -37,7 +42,7 @@ jobs:
           LINK_TO_PROFILE: "true"
 
       - name: Create GitHub Discussion
-        uses: abirismyname/create-discussion@v2.1.0
+        uses: abirismyname/create-discussion@c2b7c825241769dda523865ae444a879f6bbd0e0 # v2.1.0
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
